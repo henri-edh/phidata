@@ -1,0 +1,26 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 23 * * *'  # Runs every day at 23:00 UTC
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "henri-edh"
+          git config --global user.email "henri@edhsport.com"
+
+      - name: Add Upstream and Sync
+        run: |
+          git remote add upstream https://github.com/phidatahq/phidata.git || true
+          git fetch upstream
+          git checkout main  # Adjust if your branch is not 'main'
+          git merge upstream/main --no-edit || true
+          git push origin main
