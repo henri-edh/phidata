@@ -1,17 +1,15 @@
 """Run `pip install yfinance` to install dependencies."""
 
 from phi.agent import Agent
-from phi.model.groq import Groq
+from phi.model.ollama import Hermes
 from phi.tools.yfinance import YFinanceTools
 
 agent = Agent(
-    model=Groq(id="llama3-groq-70b-8192-tool-use-preview"),
+    model=Hermes(id="hermes3:8b"),
     tools=[YFinanceTools(stock_price=True, analyst_recommendations=True, stock_fundamentals=True)],
-    instructions=["Use tables to display data."],
     show_tool_calls=True,
+    instructions=["Use tables to display data"],
     markdown=True,
 )
 
-agent.print_response(
-    "Summarize and compare analyst recommendations and fundamentals for TSLA and NVDA. Show in tables.", stream=True
-)
+agent.print_response("Summarize analyst recommendations and fundamentals for TSLA", stream=True)
