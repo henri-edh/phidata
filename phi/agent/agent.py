@@ -493,8 +493,7 @@ class Agent(BaseModel):
             except ModuleNotFoundError as e:
                 logger.exception(e)
                 logger.error(
-                    "phidata uses `openai` as the default model provider. "
-                    "Please provide a `model` or install `openai`."
+                    "phidata uses `openai` as the default model provider. Please provide a `model` or install `openai`."
                 )
                 exit(1)
             self.model = OpenAIChat()  # We default to OpenAIChat as a base model
@@ -2019,8 +2018,7 @@ class Agent(BaseModel):
                     structured_output = None
                     try:
                         structured_output = self.response_model.model_validate_json(run_response.content)
-                    except ValidationError as exc:
-                        logger.warning(f"Failed to convert response to pydantic model: {exc}")
+                    except ValidationError:
                         # Check if response starts with ```json
                         if run_response.content.startswith("```json"):
                             run_response.content = run_response.content.replace("```json\n", "").replace("\n```", "")
@@ -2145,7 +2143,10 @@ class Agent(BaseModel):
         self.model = cast(Model, self.model)
         if stream and self.is_streamable:
             model_response = ModelResponse(content="")
-            model_response_stream = self.model.aresponse_stream(messages=messages_for_model)
+            if hasattr(self.model, "aresponse_stream"):
+                model_response_stream = self.model.aresponse_stream(messages=messages_for_model)
+            else:
+                raise NotImplementedError(f"{self.model.id} does not support streaming")
             async for model_response_chunk in model_response_stream:  # type: ignore
                 if model_response_chunk.event == ModelResponseEvent.assistant_response.value:
                     if model_response_chunk.content is not None and model_response.content is not None:
