@@ -3,7 +3,8 @@ from enum import Enum
 from time import time
 from typing import Any, Dict, List, Optional
 
-from agno.media import AudioResponse
+from agno.media import AudioResponse, ImageArtifact
+from agno.models.message import Citations
 
 
 class ModelResponseEvent(str, Enum):
@@ -23,6 +24,7 @@ class ModelResponse:
     content: Optional[str] = None
     parsed: Optional[Any] = None
     audio: Optional[AudioResponse] = None
+    image: Optional[ImageArtifact] = None
     tool_calls: List[Dict[str, Any]] = field(default_factory=list)
     event: str = ModelResponseEvent.assistant_response.value
 
@@ -31,6 +33,8 @@ class ModelResponse:
     thinking: Optional[str] = None
     redacted_thinking: Optional[str] = None
     reasoning_content: Optional[str] = None
+
+    citations: Optional[Citations] = None
 
     response_usage: Optional[Any] = None
 
